@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sql查询</title>
+    <style>
+        html, body, #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.27/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.27/" ></script>
+    <script>
+            require(["esri/config",
+                "esri/Map",
+                "esri/views/MapView",
+                "esri/layers/FeatureLayer",
+                "esri/layers/MapImageLayer",
+                "esri/Basemap"
+            ], function (
+                esriConfig,
+                Map,
+                MapView,
+                FeatureLayer,
+                MapImageLayer,
+                Basemap,
+                ) {
+    
+                var baseUrl = "http://127.0.0.1:6080/arcgis/rest/services/MyQueryService/MapServer";
+
+                // let layer = new MapImageLayer({
+                //     url: baseUrl,
+                //     sublayers: [
+                //     {
+                //             id: 1,
+                //             outFields: "*",
+                //             source: {
+                //                 type: "data-layer",
+                //                 dataSource: {
+                //                     type: "query-table",
+                //                     workspaceId: "DatabaseID",
+                //                     query: "SELECT map.*, p.population, p.datetime FROM T2023年初地级矢量 as map join Population as p on map.code = p.code where p.datetime = '2022-12-01 00:00:00.000'",
+                //                     spatialReference: {wkid: 4326},
+                //                     geometryType: "polygon",
+                //                     oidFields: "OBJECTID"
+                //                 }
+                //             },
+                          
+                //             popupTemplate: {
+                //                 title: "{population} {datetime}",
+                //             }
+                //     }
+                //     ]
+                // });
+
+                let layer = new FeatureLayer({
+                    url: baseUrl,
+                    outFields: "*",
+                    dynamicDataSource: {
+                        type: "data-layer",
+                        dataSource: {
+                            type: "query-table",
+                            workspaceId: "DatabaseID",
+                            query: "SELECT map.*, p.population, p.datetime FROM T2023年初地级矢量 as map join Population as p on map.code = p.code where p.datetime = '2022-12-01 00:00:00.000'",
+                            spatialReference: {wkid: 4326},
+                            geometryType: "polygon",
+                            oidFields: "OBJECTID"
+                        }
+                    },
+                    
+                    popupTemplate: {
+                        title: "人口:{population} 统计时间:{datetime}",
+                    }
+
+                });
+                esriConfig.apiKey = "AAPK673336505ec54ed6b078b081258e0726AA4moZ0RZxwEwoUvkAQlg-l_hPXhRAOM5QdLkipHp__4dOipvrMKSBdpfO2z3uEe";
+    
+                const map = new Map({
+                    basemap: "arcgis-navigation",
+                    logo: false,  //不显示Esri的logo
+    
+                });
+                const view = new MapView({
+                    map: map,
+                    center: [116.97947152080044, 39.818495664089525],
+                    zoom: 7,
+                    container: "viewDiv", // Div的Id
+                });
+                map.add(layer);
+
+            });
+        </script>
+</head>
+<body>
+    <div id="viewDiv"></div>
+</body>
+
+</html>
